@@ -1,9 +1,18 @@
-var CronJob = require('cron').CronJob;
-new CronJob('15 * * * * *', function() {
-  console.log('You will see this message every 15 seconds');
-}, null, true, 'America/New_York');
+require('dotenv').config();
+const Discord = require('discord.js');
+const CronJob = require('cron').CronJob;
 
-new CronJob('30 * * * * *', function() {
-  console.log('You will see this message every 30 seconds');
-}, null, true, 'America/New_York');
+const discordToken = process.env.DISCORD_TOKEN;
+const client = new Discord.Client();
 
+client.on('ready', () => {
+  console.log('Ready!');
+  client.user.setActivity(`Nico Nico Ni!`);
+
+  new CronJob('* 0 * * * *', function () {
+    const topChartChannel = client.channels.find(ch => ch.name === 'top-charts');
+    if (topChartChannel) topChartChannel.send('Checking in every hour.');
+  }, null, true, 'America/New_York');
+});
+
+client.login(discordToken);
