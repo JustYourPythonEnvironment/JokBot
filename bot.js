@@ -9,10 +9,11 @@ client.on('ready', () => {
   console.log('Ready!');
   client.user.setActivity(`Nico Nico Ni!`);
 
-  new CronJob('* 0 * * * *', function () {
+  const job = new CronJob('0 0 */4 * * *', function () {
     const topChartChannel = client.channels.find(ch => ch.name === 'top-charts');
-    if (topChartChannel) topChartChannel.send('Checking in every hour.');
+    if (topChartChannel) topChartChannel.send('Checking in every 4 hours.');
   }, null, true, 'America/New_York');
+  job.start();
 });
 
 client.login(discordToken);
