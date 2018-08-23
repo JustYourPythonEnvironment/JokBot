@@ -12,6 +12,10 @@ function _createYoutubeLink(el) {
     return '';
 }
 
+function getChartDataSource() {
+    return dataURL;
+}
+
 function getChartData() {
     return new Promise( (resolve, reject) => {
         request(dataURL, (err, res, html) => {
@@ -57,5 +61,6 @@ function getChartData() {
 }
 
 module.exports = {
-    getChartData
+    getChartData,
+    getChartDataSource
 }
