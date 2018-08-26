@@ -12,4 +12,4 @@ WORKDIR /app
 COPY --from=0 /app .
 COPY . .
 EXPOSE 3000
-CMD ["./node_modules/nodemon/bin/nodemon.js", "bot.js"]
+CMD ["node", "bot.js"]
