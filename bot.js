@@ -8,8 +8,8 @@ const discordToken = process.env.DISCORD_TOKEN;
 const client = new Discord.Client();
 
 client.on('ready', () => {
-  console.log('Ready!');
-  client.user.setActivity(`Nico Nico Ni!`);
+    console.log('Ready!');
+    client.user.setActivity(`Nico Nico Ni!`);
 
     const job = new CronJob('0 0 8,20 * * *', () => {
         const topChartChannel = client.channels.find(ch => ch.name === 'top-charts');

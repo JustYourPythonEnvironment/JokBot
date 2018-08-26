@@ -8,18 +8,18 @@
   },
   "scripts": {
     "start": "nodemon bot.js",
+    "rebuildDocker": "docker build -t ifalluphill/jok-bot .",
+    "startDocker": "docker run -p 3000:80 -v ${PWD}:/app ifalluphill/jok-bot",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "cron": "^1.4.0",
+    "cron": "^1.4.1",
     "discord.js": "^11.4.2",
     "dotenv": "^6.0.0",
     "nodemon": "^1.18.3",
-    "puppeteer": "^1.7.0",
-    "request": "^2.88.0",
-    "x-ray": "^2.3.3"
+    "request": "^2.88.0"
   }
 }
