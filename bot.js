@@ -37,7 +37,13 @@ client.on('ready', () => {
         }
     }, null, true, 'America/New_York');
 
+    const xmasJob = new CronJob('0 0 8 25 12 *', () => {
+        const generalChannel = client.channels.find(ch => ch.name === 'general');
+        generalChannel.send('메리 크리스마스! Merry Christmas! :ribbon: :gift: :confetti_ball: :tada:');
+    }, null, true, 'America/New_York');
+
     job.start();
+    xmasJob.start();
 });
 
 client.login(discordToken);
