@@ -4,7 +4,7 @@ const baseUrl = 'https://k2nblog.com/';
 
 const dateObj = new Date();
 const month = dateObj.getMonth() + 1; 
-const day = dateObj.getDate() - 1;
+const day = dateObj.getDate(); 
 const year = dateObj.getFullYear();
 
 function _getCurrentUrl() {
@@ -28,7 +28,9 @@ function getCalendarDataSource() {
 };
 
 async function getCalendarData() {
-    const allNewReleases = [];
+    const allNewReleases = {}
+    const releaseTypeRegex = /\[([^)]+)\][ \t]+/;
+    const fileTagRegex = /[ \t]+\([^\][]*\)$/;
     let currentPageNum = 1;
 
     while(1) {
@@ -36,7 +38,16 @@ async function getCalendarData() {
         if(currentPage == null) break;
         const $ = cheerio.load(currentPage);
         $('h2.entry-title.grid-title > a').each( (index, el) => {
-            allNewReleases.push($(el).text().replace(/[ \t]+\([^\][]*\)$/, ''));
+            let title = $(el).text();
+            const releaseType = releaseTypeRegex.exec(title)[1];
+            title = title.replace(releaseTypeRegex, '')
+                         .replace(fileTagRegex, '');
+
+            if(!allNewReleases[releaseType]) {
+                allNewReleases[releaseType] = [];
+            } 
+
+            allNewReleases[releaseType].push(title);
         });
     }
 

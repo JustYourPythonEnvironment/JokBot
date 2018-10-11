@@ -38,7 +38,7 @@ client.on('ready', () => {
         }
     }, null, true, 'America/New_York');
 
-    const calendarJob = new CronJob('0,15,30,45 * * * * *', () => {
+    const calendarJob = new CronJob('0 0 12 * * *', () => {
         const newReleasesChannel = client.channels.find(ch => ch.name === 'new-releases');
         if (newReleasesChannel) {
             getCalendarData().then( calendarData => {
@@ -54,12 +54,12 @@ client.on('ready', () => {
 
                 let embedDescription = '';
 
-                calendarData.map( releaseInfo => {
-                    embedDescription += `${releaseInfo}\n`
+                Object.keys(calendarData).map( releaseType => {
+                    embed.fields.push({
+                        'name': releaseType,
+                        'value': calendarData[releaseType].map( release => `${release}\n`).join(''),
+                    });
                 });
-
-                embed.description = embedDescription;
-
                 newReleasesChannel.send( {embed} );
             });
         }
