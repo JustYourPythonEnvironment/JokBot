@@ -26,7 +26,7 @@ function getCalendarDataSource() {
 async function getCalendarData() {
     const allNewReleases = {}
     const releaseTypeRegex = /\[([^)]+)\][ \t]+/;
-    const fileTagRegex = /[ \t]+\([^\][]*\)$/;
+    const fileTagRegex = /(.*)([\t +]\([^\]]*\))/;
     let currentPageNum = 1;
 
     while(1) {
@@ -37,7 +37,7 @@ async function getCalendarData() {
             let title = $(el).text();
             const releaseType = releaseTypeRegex.exec(title)[1];
             title = title.replace(releaseTypeRegex, '')
-                         .replace(fileTagRegex, '');
+                         .replace(fileTagRegex, '$1');
 
             if(!allNewReleases[releaseType]) {
                 allNewReleases[releaseType] = [];

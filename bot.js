@@ -26,7 +26,7 @@ client.on('ready', () => {
                     'fields': [],
                 };
 
-                chartData.map(chartSong => {
+                chartData.forEach(chartSong => {
                     embed.fields.push({
                         'name': `${chartSong.rank}. ${chartSong.song} - ${chartSong.artist}`,
                         'value': `${chartSong.link || 'N/A'}`
@@ -52,7 +52,7 @@ client.on('ready', () => {
                     'fields': [],
                 };
 
-                Object.keys(calendarData).map(releaseType => {
+                Object.keys(calendarData).forEach(releaseType => {
                     embed.fields.push({
                         'name': releaseType,
                         'value': calendarData[releaseType].map(release => `${release}\n`).join(''),
