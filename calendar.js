@@ -7,10 +7,6 @@ const month = dateObj.getMonth() + 1;
 const day = dateObj.getDate(); 
 const year = dateObj.getFullYear();
 
-function _getCurrentUrl() {
-    return `${baseUrl}/${year}/${month}/${day}/`;
-}
-
 function _asyncRequest(url) {
     return new Promise( (resolve, reject) => {
         request(url, (error, res, body) => {
@@ -24,7 +20,7 @@ function _asyncRequest(url) {
 }
 
 function getCalendarDataSource() {
-    return _getCurrentUrl();
+    return `${baseUrl}/${year}/${month}/${day}/`;
 };
 
 async function getCalendarData() {
@@ -34,7 +30,7 @@ async function getCalendarData() {
     let currentPageNum = 1;
 
     while(1) {
-        const currentPage = await _asyncRequest(`${_getCurrentUrl()}page/${currentPageNum++}`).catch(err => console.error(err));
+        const currentPage = await _asyncRequest(`${getCalendarDataSource()}page/${currentPageNum++}`).catch(err => console.error(err));
         if(currentPage == null) break;
         const $ = cheerio.load(currentPage);
         $('h2.entry-title.grid-title > a').each( (index, el) => {

@@ -15,7 +15,7 @@ client.on('ready', () => {
     const chartJob = new CronJob('0 0 8,20 * * *', () => {
         const topChartChannel = client.channels.find(ch => ch.name === 'top-charts');
         if (topChartChannel) {
-            getChartData().then( chartData => {
+            getChartData().then(chartData => {
                 const embed = {
                     'author': {
                         'name': 'Top 15 Songs (Instiz)',
@@ -26,14 +26,14 @@ client.on('ready', () => {
                     'fields': [],
                 };
 
-                chartData.map( chartSong => {
+                chartData.map(chartSong => {
                     embed.fields.push({
                         'name': `${chartSong.rank}. ${chartSong.song} - ${chartSong.artist}`,
                         'value': `${chartSong.link || 'N/A'}`
                     });
                 });
 
-                topChartChannel.send( {embed} );
+                topChartChannel.send({embed});
             });
         }
     }, null, true, 'America/New_York');
@@ -41,7 +41,7 @@ client.on('ready', () => {
     const calendarJob = new CronJob('0 0 12 * * *', () => {
         const newReleasesChannel = client.channels.find(ch => ch.name === 'new-releases');
         if (newReleasesChannel) {
-            getCalendarData().then( calendarData => {
+            getCalendarData().then(calendarData => {
                 const embed = {
                     'author': {
                         'name': 'New Releases',
@@ -52,15 +52,13 @@ client.on('ready', () => {
                     'fields': [],
                 };
 
-                let embedDescription = '';
-
-                Object.keys(calendarData).map( releaseType => {
+                Object.keys(calendarData).map(releaseType => {
                     embed.fields.push({
                         'name': releaseType,
-                        'value': calendarData[releaseType].map( release => `${release}\n`).join(''),
+                        'value': calendarData[releaseType].map(release => `${release}\n`).join(''),
                     });
                 });
-                newReleasesChannel.send( {embed} );
+                newReleasesChannel.send({embed});
             });
         }
     }, null, true, 'America/New_York');
