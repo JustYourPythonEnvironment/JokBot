@@ -27,7 +27,7 @@ function getCalendarDataSource() {
     return _getCurrentUrl();
 };
 
-async function getCurrentData() {
+async function getCalendarData() {
     const allNewReleases = [];
     let currentPageNum = 1;
 
@@ -43,11 +43,7 @@ async function getCurrentData() {
     return allNewReleases;
 };
 
-getCurrentData().then(data => {
-    console.log(data);
-})
-
 module.exports = {
     getCalendarDataSource,
-    getCurrentData,
+    getCalendarData,
 };

@@ -2,7 +2,8 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const CronJob = require('cron').CronJob;
 
-const { getChartData, getChartDataSource } = require('./scrape.js');
+const { getChartData, getChartDataSource } = require('./chart.js');
+const { getCalendarData, getCalendarDataSource } = require('./calendar.js');
 
 const discordToken = process.env.DISCORD_TOKEN;
 const client = new Discord.Client();
@@ -11,7 +12,7 @@ client.on('ready', () => {
     console.log('Ready!');
     client.user.setActivity(`Nico Nico Ni!`);
 
-    const job = new CronJob('0 0 8,20 * * *', () => {
+    const chartJob = new CronJob('0 0 8,20 * * *', () => {
         const topChartChannel = client.channels.find(ch => ch.name === 'top-charts');
         if (topChartChannel) {
             getChartData().then( chartData => {
@@ -37,12 +38,40 @@ client.on('ready', () => {
         }
     }, null, true, 'America/New_York');
 
+    const calendarJob = new CronJob('0,15,30,45 * * * * *', () => {
+        const newReleasesChannel = client.channels.find(ch => ch.name === 'new-releases');
+        if (newReleasesChannel) {
+            getCalendarData().then( calendarData => {
+                const embed = {
+                    'author': {
+                        'name': 'New Releases',
+                        'url': getCalendarDataSource(),
+                        'icon_url': 'https://yt3.ggpht.com/a-/AN66SAwl4t2Xp-dMiNe7tzRNX5WaVlbwst4emwd4ZA=s900-mo-c-c0xffffffff-rj-k-no',
+                    },
+                    'color': 0xD1002A,
+                    'fields': [],
+                };
+
+                let embedDescription = '';
+
+                calendarData.map( releaseInfo => {
+                    embedDescription += `${releaseInfo}\n`
+                });
+
+                embed.description = embedDescription;
+
+                newReleasesChannel.send( {embed} );
+            });
+        }
+    }, null, true, 'America/New_York');
+
     const xmasJob = new CronJob('0 0 8 25 12 *', () => {
         const generalChannel = client.channels.find(ch => ch.name === 'general');
         generalChannel.send('메리 크리스마스! Merry Christmas! :ribbon: :gift: :confetti_ball: :tada:');
     }, null, true, 'America/New_York');
 
-    job.start();
+    chartJob.start();
+    calendarJob.start();
     xmasJob.start();
 });
 
