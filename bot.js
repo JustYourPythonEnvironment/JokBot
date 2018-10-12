@@ -38,7 +38,7 @@ client.on('ready', () => {
         }
     }, null, true, 'America/New_York');
 
-    const calendarJob = new CronJob('0 0 12 * * *', () => {
+    const calendarJob = new CronJob('0 0 21 * * *', () => {
         const newReleasesChannel = client.channels.find(ch => ch.name === 'new-releases');
         if (newReleasesChannel) {
             getCalendarData().then(calendarData => {
