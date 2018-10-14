@@ -19,18 +19,16 @@ function _asyncRequest(url) {
     });
 }
 
-function getCalendarDataSource() {
-    return `${baseUrl}/${year}/${month}/${day}/`;
-};
-
-async function getCalendarData() {
+async function _getCalendarData(dayOffset) {
     const allNewReleases = {}
+    const calendarDate = `${year}/${month}/${day - dayOffset}`; 
+    const dataUrl = `${baseUrl}/${calendarDate}/`;
     const releaseTypeRegex = /\[([^)]+)\][ \t]+/;
     const fileTagRegex = /(.*)([\t +]\([^\]]*\))/;
     let currentPageNum = 1;
 
     while(1) {
-        const currentPage = await _asyncRequest(`${getCalendarDataSource()}page/${currentPageNum++}`).catch(err => console.error(err));
+        const currentPage = await _asyncRequest(`${dataUrl}page/${currentPageNum++}`).catch(err => console.error(err));
         if(currentPage == null) break;
         const $ = cheerio.load(currentPage);
         $('h2.entry-title.grid-title > a').each( (index, el) => {
@@ -47,10 +45,34 @@ async function getCalendarData() {
         });
     }
 
-    return allNewReleases;
+    return {
+        'releases': allNewReleases,
+        'date': calendarDate,
+        'url': dataUrl,
+    }
+};
+
+async function generateCalendarEmbed(dayOffset = 0) {
+    const releaseData = await _getCalendarData(dayOffset);
+    const embed = {
+        'author': {
+            'name': `${dayOffset > 0 ? 'Finalized' : 'New'} Releases for ${releaseData.date}`,
+            'url': releaseData.url,
+            'icon_url': 'https://yt3.ggpht.com/a-/AN66SAwl4t2Xp-dMiNe7tzRNX5WaVlbwst4emwd4ZA=s900-mo-c-c0xffffffff-rj-k-no',
+        },
+        'color': 0xD1002A,
+        'fields': [],
+    };
+
+    Object.keys(releaseData.releases).forEach(releaseType => {
+        embed.fields.push({
+            'name': releaseType,
+            'value': releaseData['releases'][releaseType].map(release => `${release}\n`).join(''),
+        });
+    });
+    return embed;
 };
 
 module.exports = {
-    getCalendarDataSource,
-    getCalendarData,
+    generateCalendarEmbed,
 };
