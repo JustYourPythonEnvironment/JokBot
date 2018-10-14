@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 const CronJob = require('cron').CronJob;
 
 const { getChartData, getChartDataSource } = require('./chart.js');
-const { getCalendarData, getCalendarDataSource } = require('./calendar.js');
+const { generateCalendarEmbed } = require('./calendar.js');
 
 const discordToken = process.env.DISCORD_TOKEN;
 const client = new Discord.Client();
@@ -38,28 +38,19 @@ client.on('ready', () => {
         }
     }, null, true, 'America/New_York');
 
-    const calendarJob = new CronJob('0 0 21 * * *', () => {
+    const calendarJob = new CronJob('0 0 21 * * *', async () => {
         const newReleasesChannel = client.channels.find(ch => ch.name === 'new-releases');
         if (newReleasesChannel) {
-            getCalendarData().then(calendarData => {
-                const embed = {
-                    'author': {
-                        'name': 'New Releases',
-                        'url': getCalendarDataSource(),
-                        'icon_url': 'https://yt3.ggpht.com/a-/AN66SAwl4t2Xp-dMiNe7tzRNX5WaVlbwst4emwd4ZA=s900-mo-c-c0xffffffff-rj-k-no',
-                    },
-                    'color': 0xD1002A,
-                    'fields': [],
-                };
+            const previousMessagesInChannel = await newReleasesChannel.fetchMessages({limit: 3});
+            const previousChartUpdatesFromBot = previousMessagesInChannel.filter(m => m.author.id === client.user.id);
+            if (previousChartUpdatesFromBot.size > 0) {
+                const previousChartUpdate = previousChartUpdatesFromBot.first();
+                const previousDayEmbed = await generateCalendarEmbed(1);
+                previousChartUpdate.edit({embed: previousDayEmbed})
+            }
 
-                Object.keys(calendarData).forEach(releaseType => {
-                    embed.fields.push({
-                        'name': releaseType,
-                        'value': calendarData[releaseType].map(release => `${release}\n`).join(''),
-                    });
-                });
-                newReleasesChannel.send({embed});
-            });
+            const currentDayEmbed = await generateCalendarEmbed();
+            await newReleasesChannel.send({embed: currentDayEmbed})
         }
     }, null, true, 'America/New_York');
 
