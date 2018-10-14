@@ -42,13 +42,11 @@ client.on('ready', () => {
         const newReleasesChannel = client.channels.find(ch => ch.name === 'new-releases');
         if (newReleasesChannel) {
             const previousMessagesInChannel = await newReleasesChannel.fetchMessages({limit: 3});
-            if (previousMessagesInChannel.size > 0) {
-                const previousChartUpdatesFromBot = previousMessagesInChannel.filter(m => m.author.id === client.user.id);
-                if (previousChartUpdatesFromBot.size > 0) {
-                    const previousChartUpdate = previousChartUpdatesFromBot.first();
-                    const previousDayEmbed = await generateCalendarEmbed(1);
-                    previousChartUpdate.edit({embed: previousDayEmbed})
-                }
+            const previousChartUpdatesFromBot = previousMessagesInChannel.filter(m => m.author.id === client.user.id);
+            if (previousChartUpdatesFromBot.size > 0) {
+                const previousChartUpdate = previousChartUpdatesFromBot.first();
+                const previousDayEmbed = await generateCalendarEmbed(1);
+                previousChartUpdate.edit({embed: previousDayEmbed})
             }
 
             const currentDayEmbed = await generateCalendarEmbed();
