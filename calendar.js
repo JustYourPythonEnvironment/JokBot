@@ -3,8 +3,8 @@ const cheerio = require('cheerio');
 const baseUrl = 'https://k2nblog.com/';
 
 const dateObj = new Date();
-const month = dateObj.getMonth() + 1; 
-const day = dateObj.getDate(); 
+const month = dateObj.getMonth() + 1;
+const day = dateObj.getDate();
 const year = dateObj.getFullYear();
 
 function _asyncRequest(url) {
@@ -21,28 +21,31 @@ function _asyncRequest(url) {
 
 async function _getCalendarData(dayOffset) {
     const allNewReleases = {}
-    const calendarDate = `${year}/${month}/${day - dayOffset}`; 
+    const calendarDate = `${year}/${month}/${day - dayOffset}`;
     const dataUrl = `${baseUrl}/${calendarDate}/`;
     const releaseTypeRegex = /\[([^)]+)\][ \t]+/;
     const fileTagRegex = /(.*)([\t +]\([^\]]*\))/;
     let currentPageNum = 1;
 
-    while(1) {
-        const currentPage = await _asyncRequest(`${dataUrl}page/${currentPageNum++}`).catch(err => console.error(err));
-        if(currentPage == null) break;
-        const $ = cheerio.load(currentPage);
-        $('h2.entry-title.grid-title > a').each( (index, el) => {
-            let title = $(el).text();
-            const releaseType = releaseTypeRegex.exec(title)[1];
-            title = title.replace(releaseTypeRegex, '')
-                         .replace(fileTagRegex, '$1');
+    try {
+        let currentPage;
+        while(currentPage = await _asyncRequest(`${dataUrl}page/${currentPageNum++}`)) {
+            const $ = cheerio.load(currentPage);
+            $('h2.entry-title.grid-title > a').each( (index, el) => {
+                let title = $(el).text();
+                const releaseType = releaseTypeRegex.exec(title)[1];
+                title = title.replace(releaseTypeRegex, '')
+                             .replace(fileTagRegex, '$1');
 
-            if(!allNewReleases[releaseType]) {
-                allNewReleases[releaseType] = [];
-            } 
+                if(!allNewReleases[releaseType]) {
+                    allNewReleases[releaseType] = [];
+                }
 
-            allNewReleases[releaseType].push(title);
-        });
+                allNewReleases[releaseType].push(title);
+            });
+        }
+    } catch(err) {
+        console.error(err);
     }
 
     return {
