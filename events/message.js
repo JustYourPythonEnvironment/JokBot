@@ -1,4 +1,4 @@
-module.exports = async (client, message) => {
+module.exports = (client, message) => {
     if (message.author.bot || message.content.indexOf(client.config.prefix) !== 0) return;
 
     const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);

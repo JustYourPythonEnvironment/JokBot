@@ -18,7 +18,7 @@ module.exports = {
 
         let description = "";
 
-        commands.forEach( command => {
+        commands.forEach(command => {
             try {
                 description = `${description}\n**${command.conf.name}** - (${command.conf.aliases.join(', ')})`;
             } catch (err) {

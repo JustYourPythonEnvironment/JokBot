@@ -3,7 +3,7 @@ const CronJob = require('cron').CronJob;
 const { getChartData, getChartDataSource } = require('../utils/chart.js');
 const { generateCalendarEmbed } = require('../utils/calendar.js');
 
-module.exports = async (client) => {
+module.exports = client => {
     console.log('Ready!');
     client.user.setActivity(`Nico Nico Ni!`);
 
