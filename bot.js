@@ -4,6 +4,7 @@ const CronJob = require('cron').CronJob;
 
 const { getChartData, getChartDataSource } = require('./chart.js');
 const { generateCalendarEmbed } = require('./calendar.js');
+const { getYoutubeUrl } = require('./youtube.js');
 
 const discordToken = process.env.DISCORD_TOKEN;
 const client = new Discord.Client();
@@ -63,5 +64,27 @@ client.on('ready', () => {
     calendarJob.start();
     xmasJob.start();
 });
+
+client.on('message', async message => {
+    if (message.author.bot) return;
+    if (!message.content.startsWith('linkmethat')) return;
+    const searchTerm = message.content.split(' ').slice(1).join(' ');
+    try {
+        const toSend = await getYoutubeUrl(searchTerm);
+        const botMsg = await message.channel.send(toSend.url);
+        const replies = new Discord.MessageCollector(botMsg.channel, replies => replies.author == message.author, { time: 15000 } );
+        replies.on('collect', async reply => {
+            console.log('asdf')
+            if (reply.content === 'bad bot') {
+                await botMsg.edit(`Yikes! Let me delete that video.`);
+                await message.channel.send(`Sorry about that.`);
+            }
+        });
+    } catch(err) {
+        message.channel.send(`I can't search for that yet!`)
+        console.error(err);
+    }
+})
+
 
 client.login(discordToken);

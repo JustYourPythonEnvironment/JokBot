@@ -1,23 +1,12 @@
-const request = require('request');
 const cheerio = require('cheerio');
+const { asyncRequest } = require('./utils/utils.js');
+
 const baseUrl = 'https://k2nblog.com/';
 
 const dateObj = new Date();
 const month = dateObj.getMonth() + 1;
 const day = dateObj.getDate();
 const year = dateObj.getFullYear();
-
-function _asyncRequest(url) {
-    return new Promise( (resolve, reject) => {
-        request(url, (error, res, body) => {
-            if (!error && (res.statusCode == 200 || res.statusCode == 301)) {
-                resolve(body);
-            } else {
-                reject(error);
-            }
-        });
-    });
-}
 
 async function _getCalendarData(dayOffset) {
     const allNewReleases = {}
@@ -29,7 +18,7 @@ async function _getCalendarData(dayOffset) {
 
     try {
         let currentPage;
-        while(currentPage = await _asyncRequest(`${dataUrl}page/${currentPageNum++}`)) {
+        while(currentPage = await asyncRequest(`${dataUrl}page/${currentPageNum++}`)) {
             const $ = cheerio.load(currentPage);
             $('h2.entry-title.grid-title > a').each( (index, el) => {
                 let title = $(el).text();
