@@ -1,5 +1,5 @@
 const cheerio = require('cheerio');
-const { asyncRequest } = require('./utils/utils.js');
+const { asyncRequest } = require('./utils.js');
 
 const baseUrl = 'https://k2nblog.com/';
 

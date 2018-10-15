@@ -1,7 +1,7 @@
 const stringSimilarity = require('string-similarity');
 const cheerio = require('cheerio');
 
-const { asyncRequest } = require('./utils/utils.js');
+const { asyncRequest } = require('./utils.js');
 
 const baseUrl = 'https://www.youtube.com/results?search_query=';
 

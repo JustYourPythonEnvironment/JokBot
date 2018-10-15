@@ -1,90 +1,48 @@
 require('dotenv').config();
 const Discord = require('discord.js');
-const CronJob = require('cron').CronJob;
-
-const { getChartData, getChartDataSource } = require('./chart.js');
-const { generateCalendarEmbed } = require('./calendar.js');
-const { getYoutubeUrl } = require('./youtube.js');
+const fs = require('fs');
+const config = require('./config.json');
 
 const discordToken = process.env.DISCORD_TOKEN;
 const client = new Discord.Client();
 
-client.on('ready', () => {
-    console.log('Ready!');
-    client.user.setActivity(`Nico Nico Ni!`);
+const COMMANDS_DIR = './commands/';
+const EVENTS_DIR = './events/';
 
-    const chartJob = new CronJob('0 0 8,20 * * *', () => {
-        const topChartChannel = client.channels.find(ch => ch.name === 'top-charts');
-        if (topChartChannel) {
-            getChartData().then(chartData => {
-                const embed = {
-                    'author': {
-                        'name': 'Top 15 Songs (Instiz)',
-                        'url': getChartDataSource(),
-                        'icon_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQt1xxR4_XGo2yI11GgRf2ErhIvbClHgTfDr8RxILjvEjfTT6uoZA',
-                    },
-                    'color': 0x1FC679,
-                    'fields': [],
-                };
+client.config = config;
+client.commands = new Discord.Collection();
+client.aliases = new Discord.Collection();
 
-                chartData.forEach(chartSong => {
-                    embed.fields.push({
-                        'name': `${chartSong.rank}. ${chartSong.song} - ${chartSong.artist}`,
-                        'value': `${chartSong.link || 'N/A'}`
-                    });
-                });
-
-                topChartChannel.send({embed});
-            });
-        }
-    }, null, true, 'America/New_York');
-
-    const calendarJob = new CronJob('0 0 21 * * *', async () => {
-        const newReleasesChannel = client.channels.find(ch => ch.name === 'new-releases');
-        if (newReleasesChannel) {
-            const previousMessagesInChannel = await newReleasesChannel.fetchMessages({limit: 3});
-            const previousChartUpdatesFromBot = previousMessagesInChannel.filter(m => m.author.id === client.user.id);
-            if (previousChartUpdatesFromBot.size > 0) {
-                const previousChartUpdate = previousChartUpdatesFromBot.first();
-                const previousDayEmbed = await generateCalendarEmbed(1);
-                previousChartUpdate.edit({embed: previousDayEmbed})
-            }
-
-            const currentDayEmbed = await generateCalendarEmbed();
-            await newReleasesChannel.send({embed: currentDayEmbed})
-        }
-    }, null, true, 'America/New_York');
-
-    const xmasJob = new CronJob('0 0 8 25 12 *', () => {
-        const generalChannel = client.channels.find(ch => ch.name === 'general');
-        generalChannel.send('메리 크리스마스! Merry Christmas! :ribbon: :gift: :confetti_ball: :tada:');
-    }, null, true, 'America/New_York');
-
-    chartJob.start();
-    calendarJob.start();
-    xmasJob.start();
+fs.readdir(COMMANDS_DIR, (err, files) => {
+  if (err) {
+    console.error(err);
+  } else {
+    files.forEach(f => {
+      const props = require(`${COMMANDS_DIR}${f}`);
+      if (props.conf.enabled) {
+        client.commands.set(props.conf.name, props);
+        props.conf.aliases.forEach(alias => {
+          client.aliases.set(alias, props.conf.name);
+        });
+        console.log(`Loaded Command: ${props.conf.name}. 👌`);
+      }
+    });
+  }
 });
 
-client.on('message', async message => {
-    if (message.author.bot) return;
-    if (!message.content.startsWith('linkmethat')) return;
-    const searchTerm = message.content.split(' ').slice(1).join(' ');
-    try {
-        const toSend = await getYoutubeUrl(searchTerm);
-        const botMsg = await message.channel.send(toSend.url);
-        const replies = new Discord.MessageCollector(botMsg.channel, replies => replies.author == message.author, { time: 15000 } );
-        replies.on('collect', async reply => {
-            console.log('asdf')
-            if (reply.content === 'bad bot') {
-                await botMsg.edit(`Yikes! Let me delete that video.`);
-                await message.channel.send(`Sorry about that.`);
-            }
-        });
-    } catch(err) {
-        message.channel.send(`I can't search for that yet!`)
-        console.error(err);
-    }
-})
-
+fs.readdir(EVENTS_DIR, (err, files) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(`Loading a total of ${files.length} events.`);
+    files.forEach(f => {
+      const eventName = f.split(".")[0];
+      /* eslint-disable-next-line import/no-dynamic-require, global-require */
+      const event = require(`${EVENTS_DIR}${f}`);
+      client.on(eventName, event.bind(null, client));
+      delete require.cache[require.resolve(`${EVENTS_DIR}${f}`)];
+    });
+  }
+});
 
 client.login(discordToken);
