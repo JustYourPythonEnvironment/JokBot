@@ -15,7 +15,7 @@ function _cleanSearchString(str) {
 
 function _enhanceSearchString(str) {
     if (MV_SCOPING_WORDS.test(str)) return str;
-    return `${str} mv`
+    return `${str} mv`;
 };
 
 function _buildYoutubeSearchUrl(str) {
@@ -32,8 +32,8 @@ async function getYoutubeUrl(searchString) {
     let match;
 
     $('h3.yt-lockup-title > a').each((index, el) => {
-        let title = $(el).text();
-        let url = `https://www.youtube.com${$(el).attr('href')}`;
+        const title = $(el).text();
+        const url = `https://www.youtube.com${$(el).attr('href')}`;
 
         if ((stringSimilarity.compareTwoStrings(title, searchString)) >= MATCH_SENSITIVITY && !(INVALID_TITLE_WORDS.test(title.toLowerCase()))) {
             match = { title, url };

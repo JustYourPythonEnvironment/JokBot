@@ -1,5 +1,3 @@
-const { getYoutubeUrl } = require('../utils/youtube.js');
-
 module.exports = async (client, message) => {
     if (message.author.bot || message.content.indexOf(client.config.prefix) !== 0) return;
 
