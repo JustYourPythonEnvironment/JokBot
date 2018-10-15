@@ -19,7 +19,9 @@
     "cron": "^1.4.1",
     "discord.js": "^11.4.2",
     "dotenv": "^6.0.0",
-    "request": "^2.88.0"
+    "kor-string-similarity": "^1.0.2",
+    "request": "^2.88.0",
+    "string-similarity": "^2.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.3"
