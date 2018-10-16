@@ -7,12 +7,14 @@ const { asyncRequest } = require('./utils.js');
 const baseUrl = 'https://www.youtube.com/results?search_query=';
 
 const MATCH_SENSITIVITY = 0.2;
-const INVALID_TITLE_WORDS = /\blyrics\b|\bmirrored\b|\bteaser\b|\btrailer\b|\bdance practice\b/;
-const MV_SCOPING_WORDS = /\bmv\b|\bm\/v\b|\bmusic video\b/;
+const INVALID_TITLE_WORDS = /\blyrics\b|\bmirrored\b|\bteaser\b|\btrailer\b|\bdance practice\b|\bdance video\b|\bpractice video\b|\bchoreography\b/g;
+const MV_SCOPING_WORDS = /\bmv\b|\bm\/v\b|\bmusic video\b/g;
 const ASCII = /^[ -~]+$/;
 
 function _cleanSearchString(str) {
-    return str.toLowerCase().replace(/\b\sby\s\b|\b\s\-\s\b/g, ' ')
+    return str.toLowerCase()
+        .replace(/\b\sby\s\b|\b\s\-\s\b/g, ' ')
+        .replace(INVALID_TITLE_WORDS, ' ')
         .replace(/\s\s+/g, ' ')
         .trim();
 };
