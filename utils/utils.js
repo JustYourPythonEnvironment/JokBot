@@ -44,11 +44,15 @@ errAndMsg = (channel, err) => {
     channel.send(`${errorPhrases[getRandomIndex(errorPhrases)]} ${err}`);
 };
 
+isEmptyObj = (obj) => {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+}
 
 module.exports = {
     asyncRequest,
     logAndMsg,
     getRandomIndex,
     errAndMsg,
+    isEmptyObj
 };
 

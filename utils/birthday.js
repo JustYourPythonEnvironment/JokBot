@@ -1,5 +1,5 @@
 const cheerio = require('cheerio');
-const { asyncRequest } = require('./utils.js');
+const { asyncRequest, isEmptyObj } = require('./utils.js');
 
 const dateObj = new Date();
 const month = dateObj.getMonth() + 1;
@@ -69,7 +69,9 @@ async function _getBirthdayData() {
         console.error(err);
     }
 
-    const currentDayBirthdayObj = currentMonthBirthdays[currentDay].reduce((acc, obj) => {
+    const currentMonthBirthdaysArr = currentMonthBirthdays[currentDay] || [];
+
+    const currentDayBirthdayObj = currentMonthBirthdaysArr.reduce((acc, obj) => {
         if (acc[obj.year] !== undefined) {
             acc[obj.year].push(obj.name);
         } else {
@@ -78,7 +80,6 @@ async function _getBirthdayData() {
         return acc;
     }, {});
 
-    return currentDayBirthdayObj;
 }
 
 async function generateBirthdayEmbed() {
@@ -93,13 +94,19 @@ async function generateBirthdayEmbed() {
         'fields': [],
     };
 
-    Object.keys(currentDayData).forEach(year => {
+    if (isEmptyObj(currentDayData)) {
         embed.fields.push({
-            'name': year,
-            'value': currentDayData[year].map(person => `${person}\n`).join(''),
+            'name': 'Oh no!',
+            'value': `I couldn't find any birthdays today.`,
         });
-    });
-
+    } else {
+        Object.keys(currentDayData).forEach(year => {
+            embed.fields.push({
+                'name': year,
+                'value': currentDayData[year].map(person => `${person}\n`).join(''),
+            });
+        });
+    }
     return embed;
 };
 
