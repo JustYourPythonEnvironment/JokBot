@@ -80,6 +80,7 @@ async function _getBirthdayData() {
         return acc;
     }, {});
 
+    return currentDayBirthdayObj;
 }
 
 async function generateBirthdayEmbed() {
