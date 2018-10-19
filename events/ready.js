@@ -2,6 +2,7 @@ const CronJob = require('cron').CronJob;
 
 const { getChartData, getChartDataSource } = require('../utils/chart.js');
 const { generateCalendarEmbed } = require('../utils/calendar.js');
+const { generateBirthdayEmbed } = require('../utils/birthday.js');
 
 module.exports = client => {
     console.log('Ready!');
@@ -43,8 +44,16 @@ module.exports = client => {
                 previousChartUpdate.edit({embed: previousDayEmbed})
             }
 
-            const currentDayEmbed = await generateCalendarEmbed();
-            await newReleasesChannel.send({embed: currentDayEmbed});
+            const currentDayCalendarEmbed = await generateCalendarEmbed();
+            await newReleasesChannel.send({ embed: currentDayCalendarEmbed});
+        }
+    }, null, true, 'America/New_York');
+
+    const birthdayCron = new CronJob('0 0 9 * * *', async () => {
+        const birthdayChannel = client.channels.find(ch => ch.name === 'birthdays');
+        if (birthdayChannel) {
+            const currentDayBirthdayEmbed = await generateBirthdayEmbed();
+            await birthdayChannel.send({ embed: currentDayBirthdayEmbed });
         }
     }, null, true, 'America/New_York');
 
@@ -55,5 +64,6 @@ module.exports = client => {
 
     chartJob.start();
     calendarJob.start();
+    birthdayCron.start();
     xmasJob.start();
 };
