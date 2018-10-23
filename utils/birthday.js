@@ -1,5 +1,5 @@
 const cheerio = require('cheerio');
-const { asyncRequest, isEmptyObj } = require('./utils.js');
+const { asyncRequest, isEmptyObj, getDateObj } = require('./utils.js');
 
 const dateObj = new Date();
 const month = dateObj.getMonth() + 1;
@@ -8,53 +8,61 @@ const day = dateObj.getDate();
 const birthdayListObj = {
     1: { url: 'https://www.wattpad.com/61299095-kpop-idols-birthday-list-january',
         shortName: 'Jan',
-        },
+    },
     2: { url: 'https://www.wattpad.com/61299296-kpop-idols-birthday-list-february',
         shortName: 'Feb',
-        },
+    },
     3: { url: 'https://www.wattpad.com/61299532-kpop-idols-birthday-list-march',
         shortName: 'Mar',
-        },
+    },
     4: { url: 'https://www.wattpad.com/61299704-kpop-idols-birthday-list-april',
         shortName: 'Apr',
-        },
+    },
     5: { url: 'https://www.wattpad.com/61299863-kpop-idols-birthday-list-may',
         shortName: 'May',
-        },
+    },
     6: { url: 'https://www.wattpad.com/61300028-kpop-idols-birthday-list-june',
         shortName: 'Jun',
-        },
+    },
     7: { url: 'https://www.wattpad.com/61300363-kpop-idols-birthday-list-july',
         shortName: 'Jul',
-        },
+    },
     8: { url: 'https://www.wattpad.com/61302597-kpop-idols-birthday-list-august',
         shortName: 'Aug',
-        },
+    },
     9: { url: 'https://www.wattpad.com/61302846-kpop-idols-birthday-list-september',
         shortName: 'Sept',
-        },
+    },
     10: { url: 'https://www.wattpad.com/61303014-kpop-idols-birthday-list-october',
         shortName: 'Oct',
-        },
+    },
     11: { url: 'https://www.wattpad.com/61303233-kpop-idols-birthday-list-november',
         shortName: 'Nov',
-        },
+    },
     12: { url: 'https://www.wattpad.com/61303370-kpop-idols-birthday-list-december',
         shortName: 'Dec',
-        }, 
+    }, 
 };
 
-async function _getBirthdayData() {
+const spoofingHeaders = {
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    },
+};
+
+async function _getBirthdayData(dateObj) {
+    const { day, month } = dateObj;
     const currentMonthBirthdays = {};
     const currentDay = `${birthdayListObj[month].shortName} ${day}`;
 
     try {
-        const birthdayPage = await asyncRequest(`${birthdayListObj[month].url}`, true);
+        const birthdayPage = await asyncRequest(`${birthdayListObj[month].url}`, spoofingHeaders);
         const $ = cheerio.load(birthdayPage);
 
         let birthdate;
         $('pre > p').each((index, el) => {
-            let insideText = $(el).text().trim();
+            const insideText = $(el).text().trim();
             if (insideText.startsWith(birthdayListObj[month].shortName)) {
                 birthdate = insideText;
                 currentMonthBirthdays[birthdate] = [];
@@ -84,7 +92,9 @@ async function _getBirthdayData() {
 }
 
 async function generateBirthdayEmbed() {
-    const currentDayData = await _getBirthdayData();
+    const dateObj = getDateObj();
+    const { day, month } = dateObj;
+    const currentDayData = await _getBirthdayData(dateObj);
     const embed = {
         'author': {
             'name': `Today's Birthdays ${month}/${day}`,

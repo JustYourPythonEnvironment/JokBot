@@ -1,14 +1,10 @@
 const cheerio = require('cheerio');
-const { asyncRequest } = require('./utils.js');
+const { asyncRequest, getDateObj } = require('./utils.js');
 
 const baseUrl = 'https://k2nblog.com/';
 
-const dateObj = new Date();
-const month = dateObj.getMonth() + 1;
-const day = dateObj.getDate();
-const year = dateObj.getFullYear();
-
-async function _getCalendarData(dayOffset) {
+async function _getCalendarData(dateObj, dayOffset) {
+    const { day, month, year } = dateObj;
     const allNewReleases = {}
     const calendarDate = `${year}/${month}/${day - dayOffset}`;
     const dataUrl = `${baseUrl}/${calendarDate}/`;
@@ -45,7 +41,9 @@ async function _getCalendarData(dayOffset) {
 };
 
 async function generateCalendarEmbed(dayOffset = 0) {
-    const releaseData = await _getCalendarData(dayOffset);
+    const dateObj = getDateObj();
+    const { day, month, year } = dateObj;
+    const releaseData = await _getCalendarData(dateObj, dayOffset);
     const embed = {
         'author': {
             'name': `${dayOffset > 0 ? 'Finalized' : 'New'} Releases for ${releaseData.date}`,
