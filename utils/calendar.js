@@ -42,7 +42,6 @@ async function _getCalendarData(dateObj, dayOffset) {
 
 async function generateCalendarEmbed(dayOffset = 0) {
     const dateObj = getDateObj();
-    const { day, month, year } = dateObj;
     const releaseData = await _getCalendarData(dateObj, dayOffset);
     const embed = {
         'author': {
