@@ -28,7 +28,7 @@ module.exports = {
                 const replyCollector = new MessageCollector(botMsg.channel, replies => replies.author.id === message.author.id, { time: client.config.mvLinkDeletionTimeout } );
                 replyCollector.on('collect', async reply => {
                     if (reply.content === 'bad bot') {
-                        await botMsg.edit(`Shoot! Let me delete that link.`);
+                        await botMsg.edit(`\`[deleted link]\``);
                         await message.channel.send(`Sorry for sending that.`);
                         replyCollector.stop();
                     }
