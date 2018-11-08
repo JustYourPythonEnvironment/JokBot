@@ -18,9 +18,11 @@ module.exports = {
     run: async (client, message, args) => {
         const searchTerm = args.join(' ');
 
-        if (args[0] === HELP || args[0] === HELP_SHORT || args.length < 1) {
-            helpEmbed(message, configuration);
+        if (args.length < 1) {
             Utils.errAndMsg(message.channel, 'Invalid arguments.');
+            helpEmbed(message, configuration);
+        } else if (args[0] === HELP || args[0] === HELP_SHORT) {
+            helpEmbed(message, configuration);
         } else {
             try {
                 const toSend = await getCCLyricsUrl(searchTerm);
