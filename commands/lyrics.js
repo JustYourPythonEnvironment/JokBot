@@ -2,14 +2,14 @@ const { MessageCollector } = require('discord.js');
 const helpEmbed = require('../embeds/helpEmbed.js');
 const { HELP, HELP_SHORT } = require('../assets/flags.json');
 const Utils = require('../utils/utils.js');
-const { getYoutubeUrl } = require('../utils/youtube.js');
+const { getCCLyricsUrl } = require('../utils/cclyrics.js');
 
 const configuration = {
     enabled: true,
-    name: 'sendmv',
-    aliases: [ 'linkmethat', 'mv' ],
-    description: 'Send a link to a YouTube music video based on the search term.',
-    usage: 'sendmv <SEARCH_TERM>',
+    name: 'lyrics',
+    aliases: [ 'ccl' ],
+    description: `Send a link to a song's lyrics based on the search term.`,
+    usage: 'lyrics <SEARCH_TERM>',
 };
 
 module.exports = {
@@ -25,13 +25,13 @@ module.exports = {
             helpEmbed(message, configuration);
         } else {
             try {
-                const toSend = await getYoutubeUrl(searchTerm);
-                const botMsg = await message.channel.send(toSend.url);
+                const toSend = await getCCLyricsUrl(searchTerm);
+                const botMsg = await message.channel.send(toSend);
                 const replyCollector = new MessageCollector(botMsg.channel, replies => replies.author.id === message.author.id, { time: client.config.mvLinkDeletionTimeout } );
                 replyCollector.on('collect', async reply => {
                     if (reply.content === 'bad bot') {
-                        await botMsg.edit(`\`[deleted video]\``);
-                        await message.channel.send(`Sorry about that.`);
+                        await botMsg.edit(`\`[deleted link]\``);
+                        await message.channel.send(`Sorry for sending that.`);
                         replyCollector.stop();
                     }
                 });
