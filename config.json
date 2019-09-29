@@ -1,4 +1,5 @@
 {
     "prefix": "nom-",
-    "mvLinkDeletionTimeout": 30000
+    "mvLinkDeletionTimeout": 30000,
+    "botLogChannelID": 627658565615747087
 }

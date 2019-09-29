@@ -16,14 +16,14 @@
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "cron": "^1.4.1",
-    "discord.js": "^11.4.2",
-    "dotenv": "^6.0.0",
+    "cron": "^1.7.2",
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.1.0",
     "kor-string-similarity": "^1.0.2",
     "request": "^2.88.0",
-    "string-similarity": "^2.0.0"
+    "string-similarity": "^3.0.0"
   },
   "devDependencies": {
-    "nodemon": "^1.18.3"
+    "nodemon": "^1.19.2"
   }
 }

@@ -45,4 +45,7 @@ fs.readdir(EVENTS_DIR, (err, files) => {
   }
 });
 
+client.on('warn', console.warn);
+client.on('error', console.error);
+
 client.login(discordToken);

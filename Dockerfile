@@ -1,11 +1,11 @@
-# User Node 10 Read Alpine Image
-FROM mhart/alpine-node:10
+# User Node 12 Read Alpine Image
+FROM mhart/alpine-node:12.11
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install --production
 
 # Only copy over the Node pieces we need from the above image
-FROM alpine:3.8
+FROM alpine:3.9
 COPY --from=0 /usr/bin/node /usr/bin/
 COPY --from=0 /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 WORKDIR /app
