@@ -7,7 +7,7 @@ const { generateBirthdayEmbed } = require('../utils/birthday.js');
 module.exports = client => {
     console.log('Ready!');
     client.user.setActivity(`Nico Nico Ni!`);
-
+    // 0 0 8,20 * * * 
     const chartJob = new CronJob('0 0 8,20 * * *', async () => {
         const topChartChannel = client.channels.find(ch => ch.name === 'top-charts');
         if (topChartChannel) {
