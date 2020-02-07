@@ -1,16 +1,7 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const { getYoutubeUrl } = require('./youtube');
 const dataURL = 'http://www.instiz.net/iframe_ichart_score.htm';
-
-function _createYoutubeLink(el) {
-    const ytRegex = /'(.*?)'/gm;
-
-    if (el) {
-        return `https://www.youtube.com/watch?v=${ytRegex.exec(el)[1]}`;
-    } 
-
-    return '';
-}
 
 function getChartDataSource() {
     return dataURL;
@@ -18,7 +9,7 @@ function getChartDataSource() {
 
 function getChartData() {
     return new Promise( (resolve, reject) => {
-        request(dataURL, (err, res, html) => {
+        request(dataURL, async (err, res, html) => {
             const rankings = [];
 
             if (!err && res.statusCode == 200) {
@@ -28,30 +19,50 @@ function getChartData() {
                 const firstPlaceRank = rankRegex.exec($('div#score_1st > div.ichart_score_rank > img').attr('src'))[1];
                 const firstPlaceSong = $('div#score_1st > div.ichart_score_song > div.ichart_score_song1').text();
                 const firstPlaceArtist = $('div#score_1st > div.ichart_score_artist > div.ichart_score_artist1').text();
-                const firstPlaceYoutubeLink = $('div#score_1st').next('div.spage_score_bottom').find('#yttop').attr('href');
+                const youtubeUrl = await getYoutubeUrl(`${firstPlaceSong} ${firstPlaceArtist}`); 
+                const firstPlaceUrl = youtubeUrl ? youtubeUrl.url : 'N/A'
 
                 rankings.push({
                     rank: firstPlaceRank,
                     song: firstPlaceSong,
                     artist: firstPlaceArtist,
-                    link: _createYoutubeLink(firstPlaceYoutubeLink)
+                    link: firstPlaceUrl
                 });
 
-                $('div.spage_score_item').each((index, el) => {
-                    if (index > 13) return false;
+                for (const [index, el] of Object.entries($('div.spage_score_item'))) {
+                    if (index > 13) break;
 
                     const currentRank = $('> div.ichart_score2_rank > img', el).attr('src').match(rankRegex)[0];
                     const currentSong = $('> div.ichart_score2_song > div.ichart_score2_song1', el).text();
                     const currentArtist = $('> div.ichart_score2_artist > div.ichart_score2_artist1', el).text();
-                    const currentYoutubeLinkElement = $(el).next('div.ichart_submenu.minitext3').find('.ichart_mv').children('a').attr('href');
+                    const youtubeUrl = await getYoutubeUrl(`${currentSong} ${currentArtist}`); 
+                    const currentUrl = youtubeUrl ? youtubeUrl.url : 'N/A'
 
                     rankings.push({
                         rank: currentRank,
                         song: currentSong,
                         artist: currentArtist,
-                        link: _createYoutubeLink(currentYoutubeLinkElement)
+                        link: currentUrl
                     });
-                });
+                }
+                    
+                // $('div.spage_score_item').each(async (index, el) => {
+                //     if (index > 13) return false;
+
+                //     const currentRank = $('> div.ichart_score2_rank > img', el).attr('src').match(rankRegex)[0];
+                //     const currentSong = $('> div.ichart_score2_song > div.ichart_score2_song1', el).text();
+                //     const currentArtist = $('> div.ichart_score2_artist > div.ichart_score2_artist1', el).text();
+                //     const youtubeUrl = await getYoutubeUrl(`${currentSong} ${currentArtist}`); 
+                //     const currentUrl = youtubeUrl ? youtubeUrl.url : 'N/A'
+
+                //     rankings.push({
+                //         rank: currentRank,
+                //         song: currentSong,
+                //         artist: currentArtist,
+                //         link: currentUrl
+                //     });
+                // });
+
             } else {
                 console.log(`Error: ${err}`);
             }
