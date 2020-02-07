@@ -38,8 +38,6 @@ function getChartData() {
                     const youtubeUrl = await getYoutubeUrl(`${currentSong} ${currentArtist}`); 
                     const currentUrl = youtubeUrl ? youtubeUrl.url : 'N/A'
 
-                    console.log(youtubeUrl)
-
                     rankings.push({
                         rank: currentRank,
                         song: currentSong,
