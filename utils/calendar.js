@@ -1,32 +1,33 @@
 const cheerio = require('cheerio');
 const { asyncRequest, getDateObj } = require('./utils.js');
 
-const baseUrl = 'https://k2nblog.com/';
+const baseUrl = 'https://k2nblog.com';
 
 async function _getCalendarData(dateObj, dayOffset) {
     const { day, month, year } = dateObj;
     const allNewReleases = {}
     const calendarDate = `${year}/${month}/${day - dayOffset}`;
     const dataUrl = `${baseUrl}/${calendarDate}/`;
-    const releaseTypeRegex = /\[([^)]+)\][ \t]+/;
-    const fileTagRegex = /(.*)([\t +]\([^\]]*\))/;
+    const releaseTypeRegex = /\[[^\[\]]*\]/;
+    const fileTagRegex = /\([^\(]+$/;
     let currentPageNum = 1;
 
     try {
         let currentPage;
         while(currentPage = await asyncRequest(`${dataUrl}page/${currentPageNum++}`)) {
             const $ = cheerio.load(currentPage);
-            $('h2.entry-title.grid-title > a').each( (index, el) => {
+            $('div.td-ss-main-content h3.entry-title.td-module-title > a').each( (index, el) => {
                 let title = $(el).text();
-                const releaseType = releaseTypeRegex.exec(title)[1];
+                let releaseType = releaseTypeRegex.exec(title)[0];
                 title = title.replace(releaseTypeRegex, '')
-                             .replace(fileTagRegex, '$1');
+                             .replace(fileTagRegex, '');
 
+                releaseType = releaseType.slice(1, -1);
                 if(!allNewReleases[releaseType]) {
                     allNewReleases[releaseType] = [];
                 }
 
-                allNewReleases[releaseType].push(title);
+                allNewReleases[releaseType].push(title.trim());
             });
         }
     } catch(err) {
